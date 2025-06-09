@@ -2,12 +2,13 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import prettierPlugin from "eslint-plugin-prettier";
 
 export default [
   // ignore dist
   { ignores: ["dist"] },
 
-  // your existing JS/JSX rules
+  // JS/JSX with React Hooks + Prettier
   {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
@@ -22,6 +23,7 @@ export default [
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      prettier: prettierPlugin,
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -31,10 +33,12 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
+      // Run Prettier as an ESLint rule and report errors
+      "prettier/prettier": "error",
     },
   },
 
-  // new override for CommonJS config files
+  // CommonJS config files (.cjs)
   {
     files: ["*.cjs"],
     env: { node: true },
@@ -45,7 +49,7 @@ export default [
       },
     },
     rules: {
-      // you can add any cjs-specific rule tweaks here
+      // any CJS-specific tweaks
     },
   },
 ];
