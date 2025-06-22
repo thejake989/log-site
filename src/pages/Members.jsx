@@ -31,7 +31,9 @@ const Members = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 text-white">
-      <h2 className="text-3xl font-bold mb-6 text-center">📋 Members</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-black">
+        📋 Members
+      </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {members.map((member) => (
           <Link

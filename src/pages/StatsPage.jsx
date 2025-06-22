@@ -1,3 +1,4 @@
+// src/pages/StatsPage.jsx
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -56,20 +57,13 @@ const StatsPage = () => {
   const sortedPlayers = [...players].sort((a, b) => {
     const valA = a[sortConfig.key];
     const valB = b[sortConfig.key];
-
-    if (typeof valA === "string") {
-      return sortConfig.direction === "asc"
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    } else {
-      return sortConfig.direction === "asc" ? valA - valB : valB - valA;
-    }
+    return sortConfig.direction === "asc" ? valA - valB : valB - valA;
   });
 
-  const header = (label, key) => (
+  const renderHeader = (label, key) => (
     <th
       onClick={() => handleSort(key)}
-      className="p-2 cursor-pointer hover:underline"
+      className="px-4 py-2 cursor-pointer text-left text-sm font-semibold text-white hover:text-blue-400"
     >
       {label}{" "}
       {sortConfig.key === key
@@ -82,35 +76,39 @@ const StatsPage = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto text-white">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        📊 LOG League Stats
+      <h2 className="text-4xl font-bold mb-8 text-center text-black">
+        📊 League Stats
       </h2>
-      <div className="overflow-x-auto bg-gray-800 rounded shadow">
-        <table className="w-full table-auto text-sm md:text-base">
+      <div className="overflow-x-auto bg-gray-800 shadow-lg rounded-lg">
+        <table className="w-full min-w-[600px] text-sm md:text-base">
           <thead className="bg-gray-700">
             <tr>
-              {header("Player", "playerName")}
-              {header("Attendance", "attendance")}
-              {header("Shirt", "logShirt")}
-              {header("Challenge", "challenge")}
-              {header("Activity", "activity")}
-              {header("Total", "total")}
+              {renderHeader("Player", "playerName")}
+              {renderHeader("Attendance", "attendance")}
+              {renderHeader("Shirt", "logShirt")}
+              {renderHeader("Challenge", "challenge")}
+              {renderHeader("Activity", "activity")}
+              {renderHeader("Total", "total")}
             </tr>
           </thead>
           <tbody>
-            {sortedPlayers.map((player) => (
+            {sortedPlayers.map((player, i) => (
               <tr
                 key={player.playerId}
-                className="odd:bg-gray-900 even:bg-gray-800 text-center"
+                className={`${
+                  i % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                } hover:bg-gray-700 transition`}
               >
-                <td className="p-2 font-semibold text-left">
+                <td className="px-4 py-3 font-medium text-white">
                   {player.playerName}
                 </td>
-                <td className="p-2">{player.attendance}</td>
-                <td className="p-2">{player.logShirt}</td>
-                <td className="p-2">{player.challenge}</td>
-                <td className="p-2">{player.activity}</td>
-                <td className="p-2 font-bold">{player.total}</td>
+                <td className="px-4 py-3 text-center">{player.attendance}</td>
+                <td className="px-4 py-3 text-center">{player.logShirt}</td>
+                <td className="px-4 py-3 text-center">{player.challenge}</td>
+                <td className="px-4 py-3 text-center">{player.activity}</td>
+                <td className="px-4 py-3 font-bold text-center">
+                  {player.total}
+                </td>
               </tr>
             ))}
           </tbody>

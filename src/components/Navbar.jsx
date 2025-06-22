@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useAuth } from "../context/AuthContext";
+import ProfileDropdownCard from "./ProfileDropdownCard";
 
 const Navbar = () => {
   const { user } = useAuth();
@@ -21,14 +22,9 @@ const Navbar = () => {
         .slice(0, 2)
     : "U";
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
-  };
-
   return (
     <nav className="bg-gray-900 text-white px-4 py-3 shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="max-w-7xl mx-auto flex justify-between items-center relative">
         {/* Brand */}
         <div className="flex items-center space-x-3">
           <span className="text-xl">🏆</span>
@@ -71,21 +67,9 @@ const Navbar = () => {
           >
             {initials}
           </button>
+
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-50 transition-all duration-150 ease-out">
-              <Link
-                to={`/profile/${user.uid}`}
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                My Profile
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                Logout
-              </button>
-            </div>
+            <ProfileDropdownCard onClose={() => setDropdownOpen(false)} />
           )}
         </div>
       </div>

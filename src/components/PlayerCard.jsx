@@ -1,52 +1,95 @@
-// src/components/PlayerCard.jsx
-import { useState } from "react";
+// src/pages/Leaderboard.jsx
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 import { Link } from "react-router-dom";
 
-const PlayerCard = ({ player, index }) => {
-  const [open, setOpen] = useState(false);
-  const initials = player.playerName
-    .split(" ")
-    .map((word) => word[0]?.toUpperCase())
-    .join("")
-    .slice(0, 2);
+const Leaderboard = () => {
+  const [totals, setTotals] = useState([]);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      const snapshot = await getDocs(collection(db, "scores"));
+      const raw = snapshot.docs.map((doc) => doc.data());
+
+      const grouped = {};
+      raw.forEach((entry) => {
+        const id = entry.playerId;
+        if (!grouped[id]) {
+          grouped[id] = {
+            playerId: id,
+            playerName: entry.playerName || "",
+            attendance: 0,
+            logShirt: 0,
+            challenge: 0,
+            activity: 0,
+            total: 0,
+          };
+        }
+        grouped[id].attendance += entry.attendance || 0;
+        grouped[id].logShirt += entry.logShirt || 0;
+        grouped[id].challenge += entry.challenge || 0;
+        grouped[id].activity += entry.activity || 0;
+        grouped[id].total +=
+          (entry.attendance || 0) +
+          (entry.logShirt || 0) +
+          (entry.challenge || 0) +
+          (entry.activity || 0);
+      });
+
+      const totalsArray = Object.values(grouped).sort(
+        (a, b) => b.total - a.total
+      );
+      setTotals(totalsArray);
+    };
+
+    fetchScores();
+  }, []);
 
   return (
-    <div className="relative mb-4">
-      <div
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-4 cursor-pointer bg-gray-800 hover:bg-gray-700 p-3 rounded-lg transition"
-      >
-        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
-          {initials}
-        </div>
-        <div className="text-white font-medium">
-          {index + 1}. {player.playerName}
-        </div>
-      </div>
+    <div className="max-w-6xl mx-auto px-4 py-10 text-white">
+      <h2 className="text-4xl font-bold mb-8 text-center">🏆 Leaderboard</h2>
 
-      {open && (
-        <div className="bg-gray-900 text-white p-4 mt-2 rounded shadow-lg space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>🎽 Shirt: {player.logShirt}</span>
-            <span>✅ Attendance: {player.attendance}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>⚡ Challenge: {player.challenge}</span>
-            <span>🎯 Activity: {player.activity}</span>
-          </div>
-          <div className="text-right mt-2 text-green-400 font-bold">
-            Total: {player.total}
-          </div>
-          <Link
-            to={`/profile/${player.playerId}`}
-            className="block mt-2 text-blue-400 hover:underline text-sm text-right"
-          >
-            View Full Profile →
-          </Link>
-        </div>
-      )}
+      <div className="bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-gray-700 text-gray-300">
+            <tr>
+              <th className="text-left py-3 px-4">Player</th>
+              <th className="py-3 px-4 text-center">Attendance</th>
+              <th className="py-3 px-4 text-center">Shirt</th>
+              <th className="py-3 px-4 text-center">Challenge</th>
+              <th className="py-3 px-4 text-center">Activity</th>
+              <th className="py-3 px-4 text-center">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {totals.map((player, i) => (
+              <tr
+                key={player.playerId}
+                className="even:bg-gray-900 hover:bg-gray-700 transition-all"
+              >
+                <td className="py-3 px-4 font-semibold text-blue-300">
+                  <Link
+                    to={`/profile/${player.playerId}`}
+                    className="hover:underline"
+                  >
+                    {i + 1}. {player.playerName}
+                  </Link>
+                </td>
+                <td className="py-3 px-4 text-center">{player.attendance}</td>
+                <td className="py-3 px-4 text-center">{player.logShirt}</td>
+                <td className="py-3 px-4 text-center">{player.challenge}</td>
+                <td className="py-3 px-4 text-center">{player.activity}</td>
+                <td className="py-3 px-4 text-center font-bold text-green-400">
+                  {player.total}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default PlayerCard;
+export default Leaderboard;
