@@ -18,8 +18,9 @@ const Dashboard = () => {
       const data = snapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
         .filter((event) => {
-          const eventDate = new Date(event.dateTime);
-          return eventDate > now;
+          const start = new Date(event.dateTime);
+          const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+          return new Date() <= end;
         })
         .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
@@ -87,33 +88,75 @@ const Dashboard = () => {
         {events.length === 0 ? (
           <p className="text-center text-gray-400">No upcoming events.</p>
         ) : (
-          events.map((event) => (
-            <div
-              key={event.id}
-              className="bg-gray-800 p-5 rounded-lg shadow-md border border-gray-700 relative cursor-pointer hover:bg-gray-700 transition"
-              onClick={() => {
-                if (event.locationUrl) {
-                  window.open(event.locationUrl, "_blank");
-                }
-              }}
-            >
-              <h3 className="text-xl font-semibold">{event.name}</h3>
-              <p className="text-gray-300 mt-1">
-                {event.month} {event.year} &bull;{" "}
-                {formatDateTime(event.dateTime)}
-              </p>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteEvent(event.id);
-                }}
-                title="Delete Event"
-                className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 shadow-sm transition"
-              >
-                ✕
-              </button>
-            </div>
-          ))
+          events.map((event) => {
+            const now = new Date();
+            const start = new Date(event.dateTime);
+            const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+            const isLive = now >= start && now <= end;
+            const isFuture = now < start;
+
+            if (isLive) {
+              return (
+                <div
+                  key={event.id}
+                  className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white p-6 rounded-lg shadow-xl text-center animate-pulse border border-white/30"
+                >
+                  <h3 className="text-3xl font-bold mb-1">🔥 EVENT IS LIVE!</h3>
+                  <p className="text-lg font-semibold">{event.name}</p>
+                  <p className="text-sm mt-1">
+                    {formatDateTime(event.dateTime)}
+                  </p>
+                  {event.locationUrl && (
+                    <a
+                      href={event.locationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-4 px-4 py-2 bg-black/30 hover:bg-black/50 transition rounded"
+                    >
+                      📍 View Location
+                    </a>
+                  )}
+                  <button
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="mt-4 text-xs bg-black/40 hover:bg-black/60 px-2 py-1 rounded"
+                  >
+                    Delete Event
+                  </button>
+                </div>
+              );
+            }
+
+            if (isFuture) {
+              return (
+                <div
+                  key={event.id}
+                  className="bg-gray-800 p-5 rounded-lg shadow-md border border-gray-700 relative cursor-pointer hover:bg-gray-700 transition"
+                  onClick={() => {
+                    if (event.locationUrl) {
+                      window.open(event.locationUrl, "_blank");
+                    }
+                  }}
+                >
+                  <h3 className="text-xl font-semibold">{event.name}</h3>
+                  <p className="text-gray-300 mt-1">
+                    {formatDateTime(event.dateTime)}
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteEvent(event.id);
+                    }}
+                    title="Delete Event"
+                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 shadow-sm transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              );
+            }
+
+            return null; // expired
+          })
         )}
       </div>
     </div>
