@@ -1,7 +1,8 @@
+// Updated Login.jsx (ensure this is in src/pages/Login.jsx)
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,27 +20,34 @@ const Login = () => {
   };
 
   return (
-    <form
-      onSubmit={handleLogin}
-      className="p-4 max-w-md mx-auto mt-12 space-y-4 bg-white rounded shadow"
-    >
-      <h2 className="text-2xl font-bold">Login</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full p-2 border rounded"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full p-2 border rounded"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="w-full py-2 bg-green-600 text-white rounded">
-        Log In
-      </button>
-    </form>
+    <div className="p-6 max-w-md mx-auto mt-12 bg-white rounded shadow-md">
+      <form onSubmit={handleLogin} className="space-y-4">
+        <h2 className="text-2xl font-bold text-center">Login</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 border rounded"
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 border rounded"
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700">
+          Log In
+        </button>
+      </form>
+      <p className="text-center mt-4">
+        New here?{" "}
+        <Link to="/register" className="text-blue-600 hover:underline">
+          Create an account
+        </Link>
+      </p>
+    </div>
   );
 };
 

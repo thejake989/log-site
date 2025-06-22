@@ -1,3 +1,4 @@
+// Updated main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -78,6 +79,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 </ProtectedRoute>
               }
             />
+
+            {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Routes>

@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import ProfileDropdownCard from "./ProfileDropdownCard";
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -57,6 +57,14 @@ const Navbar = () => {
           <Link to="/members" className="block py-1 hover:underline">
             Members
           </Link>
+          {userData?.admin && (
+            <Link
+              to="/admin"
+              className="block py-1 hover:underline text-yellow-300 font-semibold"
+            >
+              Admin
+            </Link>
+          )}
         </div>
 
         {/* Avatar Dropdown */}

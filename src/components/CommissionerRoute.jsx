@@ -10,7 +10,7 @@ const CommissionerRoute = ({ children }) => {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkRole = async () => {
+    const checkAccess = async () => {
       if (!user) {
         setChecking(false);
         return;
@@ -19,21 +19,19 @@ const CommissionerRoute = ({ children }) => {
       const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
 
-      if (snap.exists() && snap.data().role === "commissioner") {
+      if (snap.exists() && snap.data().admin === true) {
         setIsAllowed(true);
       }
 
       setChecking(false);
     };
 
-    checkRole();
+    checkAccess();
   }, [user]);
 
   if (checking) {
     return (
-      <div className="text-white p-6 text-center">
-        Checking commissioner access...
-      </div>
+      <div className="text-white p-6 text-center">Checking admin access...</div>
     );
   }
 
