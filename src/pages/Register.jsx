@@ -19,7 +19,6 @@ const Register = () => {
       );
       const user = userCred.user;
 
-      // Add user to Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role: "member",
